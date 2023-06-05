@@ -94,7 +94,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event UserAdded(address indexed userAddress, string name, uint id, address indexed userContractAddress, string role);
 
-    function AddUsers(address _to, string memory _name,uint _globalLimit, uint _id, address _Address,string memory role) public onlyOwner {
+    function AddUsers(address _to, string memory _name,uint _globalLimit, uint _id, address _Address,string memory role) public onlyOwner whenNotPaused {
         
         if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked("Premium")))
         
@@ -154,7 +154,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
         event PremiumVerified(address indexed userAddress);
 
-    function verifyPremium(address _to) public onlyOwner {
+    function verifyPremium(address _to) public onlyOwner whenNotPaused {
         require (premiumAddresses[_to].isRegistered, "The premium user is not registered");
         require (premiumAddresses[_to].isApproved == false," You are already verified");
 
@@ -217,7 +217,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
      *
     */ 
 
-     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+     function _burn(uint256 tokenId) internal whenNotPaused override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }
 
@@ -263,7 +263,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event phaseActivated (uint _currentPhase, bool _value);
 
-    function phaseActivation () public onlyOwner {
+    function phaseActivation () public onlyOwner whenNotPaused {
 
         require(phaseMapping[currentPhase].status == false, "Phase Already Active");
         require(phaseMapping[currentPhase].premiumUserLimit != 0  ," Phase not Created!");    
@@ -291,7 +291,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
         event phaseCreation(uint id, uint phaseReservedLimit, uint premiumUserLimit, uint normalUserLimit );
 
-    function createPhase (uint _value, uint _phaseReservedLimit, uint _premiumUserLimit, uint _normalUserLimit) public onlyOwner {
+    function createPhase (uint _value, uint _phaseReservedLimit, uint _premiumUserLimit, uint _normalUserLimit) public onlyOwner whenNotPaused {
         require (phaseMapping[currentPhase].status, " Phase is not active");
         require (_phaseReservedLimit < userMintingLimit, "The reserve limit is more than user minting limit");
         require (phaseMapping[currentPhase].phaseReservedLimit == 0, "Phase already created");
@@ -314,7 +314,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event phaseDeactivated ( uint _currentPhase, bool _value);
 
-    function phaseDeactivation() public onlyOwner {
+    function phaseDeactivation() public onlyOwner whenNotPaused {
     require(phaseMapping[currentPhase].status == true, "Phase not active");
     require(phaseMapping[currentPhase].premiumUserLimit != 0  ," Phase not Created!");
 
@@ -343,7 +343,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
     
     event safeMinting (address _minter, uint _tokenId, string _uri);
 
-    function safeMint( uint256 tokenId , string memory uri)public
+    function safeMint( uint256 tokenId , string memory uri) public whenNotPaused
        
     {
       require(premiumAddresses[msg.sender].isRegistered ||  normalAddresses[msg.sender].isRegistered , "Registration Required"); 
@@ -396,7 +396,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event bulkMinting (address _minter, uint _tokenId, string _uri);
 
-    function bulkMint(string [] memory uri,uint[] memory tokenId, address[] memory to) public {
+    function bulkMint(string [] memory uri,uint[] memory tokenId, address[] memory to) public whenNotPaused {
 
       require (uri.length == tokenId.length && tokenId.length == to.length, " Length not valid"  );
       require(premiumAddresses[msg.sender].isRegistered ||  normalAddresses[msg.sender].isRegistered , "Registration Required"); 
@@ -454,7 +454,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event adminMinting(address _to, string uri, uint _tkenId);
 
-    function adminMint(string [] memory uri,uint[] memory tokenId) public  
+    function adminMint(string [] memory uri,uint[] memory tokenId) public  whenNotPaused
     {
         require (uri.length == tokenId.length, " Length not valid"  );
         require (adminAddresses[msg.sender].isRegistered, "Only admin allowed");
@@ -485,7 +485,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
     */
     event globalLimitUpdation ( address _to, uint limit);
 
-    function updateGlobalLimit(address _address, uint _limit) public onlyOwner 
+    function updateGlobalLimit(address _address, uint _limit) public onlyOwner whenNotPaused
     
     {
 
@@ -526,7 +526,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
         event reservedLimitUpdation( uint _currentPhase, uint limit);
 
-    function updateReservedLimit(uint _limit) public  onlyOwner {
+    function updateReservedLimit(uint _limit) public  onlyOwner whenNotPaused {
 
         require(phaseMapping[currentPhase].status, " Phase is not active");
         require(reservedLimitOfCurrentPhase - phaseMapping[currentPhase].phaseReservedLimit < _limit, "The limit should be greater! ");
@@ -547,7 +547,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
      * @param tokenId - This is the tokenId of the NFT that is needed to be transferred
     */
 
-    function _transfer (address from, address to , uint tokenId) internal override (ERC721) 
+    function _transfer (address from, address to , uint tokenId) internal whenNotPaused override (ERC721) 
     
     {
 
@@ -564,7 +564,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
 
     event allow(bool _val);
 
-    function AllowTransfer () public onlyOwner 
+    function AllowTransfer () public onlyOwner whenNotPaused
     
     {
         require (! isTransferable, "Already allowed");
@@ -580,7 +580,7 @@ contract IECTOKEN is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownab
     
          event updateBulk(uint  _data, address _address);
 
-        function updateBulkHashes(bulkNFTs[] memory dataArray ) public {
+        function updateBulkHashes(bulkNFTs[] memory dataArray ) public whenNotPaused {
             for (uint i; i < dataArray.length; i ++) 
             {
 
